@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Top Business.lk</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6FC; --bg-alt:#ECEFFA; --surface:#FFFFFF; --surface-sunk:#EEF0FA;
+  --ink:#161A2E; --ink-soft:#545B78; --ink-faint:#8489A3;
+  --blue:#274BC7; --blue-deep:#152769; --blue-tint:#E5EAFB;
+  --violet:#7B4FE0; --violet-deep:#502E9E; --violet-tint:#F1EAFC;
+  --amber:#E0A62E; --amber-tint:#FBF0DA; --amber-deep:#A8760F;
+  --clay:#C1603A; --clay-tint:#F7E7DE;
+  --green:#2E8B57; --green-tint:#E3F3EA;
+  --shadow-xs:0 1px 2px rgba(20,24,50,0.05);
+  --shadow-sm:0 2px 8px rgba(20,24,50,0.07), 0 1px 2px rgba(20,24,50,0.05);
+  --shadow-md:0 12px 28px rgba(20,24,50,0.10), 0 3px 8px rgba(20,24,50,0.06);
+  --shadow-lg:0 26px 54px rgba(20,24,50,0.16), 0 10px 22px rgba(20,24,50,0.08);
+  --radius-sm:10px; --radius-md:16px; --radius-lg:22px; --radius-pill:999px;
+  --font-display:"Plus Jakarta Sans", ui-sans-serif, sans-serif;
+  --font-body:"Inter", ui-sans-serif, sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, monospace;
+  --focus-ring:3px solid var(--blue-deep);
+}
+*,*::before,*::after{ box-sizing:border-box; }
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{ transition-duration:.001ms !important; animation-duration:.001ms !important; } }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+img,svg{ display:block; max-width:100%; }
+a{ color:inherit; } button, input, select, textarea{ font:inherit; color:inherit; }
+ul{ margin:0; padding:0; list-style:none; }
+h1,h2,h3,p{ margin:0; }
+:focus{ outline:none; } :focus-visible{ outline:var(--focus-ring); outline-offset:2px; border-radius:6px; }
+.visually-hidden{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+/* ---------- Passcode gate ---------- */
+#gate{ position:fixed; inset:0; background:linear-gradient(135deg, var(--blue-deep), var(--violet-deep)); display:flex; align-items:flex-start; justify-content:center; z-index:500; padding:20px; overflow-y:auto; }
+.gate-card{ background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:36px; max-width:380px; width:100%; margin:auto; }
+.gate-brand{ display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+.gate-brand svg{ width:30px; height:30px; color:var(--blue-deep); }
+.gate-brand span{ font-family:var(--font-display); font-weight:800; font-size:19px; }
+.gate-brand span em{ font-style:normal; color:var(--violet); }
+.gate-card h1{ font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:8px; }
+.gate-card > p{ color:var(--ink-soft); font-size:13.5px; line-height:1.55; margin-bottom:20px; }
+#gateForm input{ width:100%; height:48px; border:none; border-radius:var(--radius-sm); background:var(--surface-sunk); padding:0 16px; font-size:15px; margin-bottom:10px; }
+#gateForm input:focus-visible{ outline:var(--focus-ring); outline-offset:2px; }
+#gateError{ display:none; color:var(--clay); font-size:13px; font-weight:600; margin-bottom:10px; }
+.gate-note{ margin-top:18px; background:var(--amber-tint); color:var(--amber-deep); border-radius:var(--radius-sm); padding:12px 14px; font-size:12px; line-height:1.5; }
+
+/* ---------- Buttons ---------- */
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:40px; padding:0 18px; border-radius:var(--radius-pill); border:none; cursor:pointer; font-weight:600; font-size:14px; transition:transform .15s, box-shadow .15s, background-color .15s; }
+.btn:hover{ transform:translateY(-1px); } .btn:active{ transform:none; }
+.btn-primary{ background:var(--blue-deep); color:#fff; box-shadow:var(--shadow-sm); }
+.btn-primary:hover{ background:#0F1E56; }
+.btn-ghost{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm); }
+.btn-ghost:hover{ background:var(--bg-alt); }
+.btn-danger{ background:var(--clay-tint); color:var(--clay); }
+.btn-danger:hover{ background:#f0d2c1; }
+.btn-success{ background:var(--green-tint); color:var(--green); }
+.btn-success:hover{ background:#d3ecdf; }
+.btn-sm{ min-height:34px; padding:0 14px; font-size:13px; }
+.btn-block{ width:100%; }
+.btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+/* ---------- Shell layout ---------- */
+#shell{ display:none; min-height:100vh; }
+#shell.is-visible{ display:flex; }
+.sidebar{ width:248px; flex-shrink:0; background:#fff; box-shadow:var(--shadow-sm); padding:22px 16px; display:flex; flex-direction:column; gap:4px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-brand{ display:flex; align-items:center; gap:9px; padding:6px 10px 22px; }
+.sidebar-brand svg{ width:26px; height:26px; color:var(--blue-deep); }
+.sidebar-brand span{ font-family:var(--font-display); font-weight:800; font-size:16.5px; }
+.sidebar-brand span em{ font-style:normal; color:var(--violet); }
+.nav-item{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:var(--radius-sm); border:none; background:transparent; text-align:left; cursor:pointer; font-weight:600; font-size:14px; color:var(--ink-soft); width:100%; }
+.nav-item svg{ width:19px; height:19px; flex-shrink:0; }
+.nav-item:hover{ background:var(--bg-alt); color:var(--ink); }
+.nav-item.is-active{ background:var(--blue-tint); color:var(--blue-deep); }
+.nav-badge{ margin-left:auto; background:var(--clay); color:#fff; font-size:11px; font-weight:700; min-width:20px; height:20px; border-radius:var(--radius-pill); display:flex; align-items:center; justify-content:center; padding:0 6px; }
+.sidebar-foot{ margin-top:auto; padding-top:16px; }
+.sidebar-foot a{ display:flex; align-items:center; gap:10px; padding:10px 14px; font-size:13px; font-weight:600; color:var(--ink-faint); text-decoration:none; border-radius:var(--radius-sm); }
+.sidebar-foot a:hover{ background:var(--bg-alt); color:var(--ink); }
+.sidebar-foot svg{ width:16px; height:16px; }
+
+.main-area{ flex-grow:1; min-width:0; padding:28px 32px 60px; }
+.topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:26px; flex-wrap:wrap; }
+.topbar h1{ font-family:var(--font-display); font-weight:800; font-size:23px; }
+.topbar p{ color:var(--ink-faint); font-size:13.5px; margin-top:4px; }
+
+.panel{ display:none; }
+.panel.is-active{ display:block; }
+
+/* ---------- Stat cards ---------- */
+.stat-cards{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-bottom:28px; }
+.stat-card{ background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:20px; }
+.stat-card .icn{ width:38px; height:38px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+.stat-card .icn svg{ width:19px; height:19px; }
+.stat-card .n{ font-family:var(--font-mono); font-weight:700; font-size:26px; }
+.stat-card .l{ font-size:12.5px; color:var(--ink-faint); margin-top:2px; }
+
+/* ---------- Cards / sections ---------- */
+.card{ background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:22px; margin-bottom:20px; }
+.card-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+.card-head h2{ font-family:var(--font-display); font-weight:700; font-size:17px; }
+.card-head p{ color:var(--ink-faint); font-size:13px; margin-top:2px; }
+
+/* ---------- Table ---------- */
+.table-wrap{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+th{ text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); font-weight:700; padding:0 14px 10px; white-space:nowrap; }
+td{ padding:13px 14px; background:var(--surface-sunk); white-space:nowrap; }
+tr td:first-child{ border-radius:10px 0 0 10px; } tr td:last-child{ border-radius:0 10px 10px 0; }
+tbody tr{ box-shadow:0 0 0 6px transparent; }
+tbody tr + tr td{ box-shadow: 0 6px 0 -3px var(--bg); }
+td.wrap{ white-space:normal; max-width:260px; }
+.cell-strong{ font-weight:700; }
+.cell-muted{ color:var(--ink-faint); }
+
+.badge{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:var(--radius-pill); white-space:nowrap; }
+.badge svg{ width:11px; height:11px; }
+.badge-pending{ background:var(--amber-tint); color:var(--amber-deep); }
+.badge-approved{ background:var(--green-tint); color:var(--green); }
+.badge-rejected{ background:var(--clay-tint); color:var(--clay); }
+.badge-live{ background:var(--blue-tint); color:var(--blue-deep); }
+.badge-paused{ background:var(--surface-sunk); color:var(--ink-faint); box-shadow:inset 0 0 0 1px rgba(20,24,50,0.08); }
+
+.avatar-sm{ width:32px; height:32px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-family:var(--font-display); font-weight:700; font-size:12.5px; }
+
+.row-actions{ display:flex; gap:6px; }
+
+.empty-row{ text-align:center; color:var(--ink-faint); padding:34px 14px; background:transparent; }
+
+/* ---------- Toggle switch ---------- */
+.toggle{ position:relative; display:inline-flex; width:40px; height:24px; }
+.toggle input{ opacity:0; width:0; height:0; }
+.toggle .track{ position:absolute; inset:0; background:var(--ink-faint); border-radius:var(--radius-pill); cursor:pointer; transition:background-color .15s; }
+.toggle .track::after{ content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition:transform .15s; }
+.toggle input:checked + .track{ background:var(--green); }
+.toggle input:checked + .track::after{ transform:translateX(16px); }
+.toggle input:focus-visible + .track{ outline:var(--focus-ring); outline-offset:2px; }
+
+/* ---------- Forms ---------- */
+.form-row{ margin-bottom:16px; }
+.form-row label{ display:block; font-weight:600; font-size:13px; margin-bottom:6px; }
+.form-row .hint{ font-weight:400; color:var(--ink-faint); font-size:12px; }
+.form-row input, .form-row select, .form-row textarea{ width:100%; border:none; border-radius:var(--radius-sm); background:var(--surface-sunk); padding:0 14px; font-size:14px; color:var(--ink); }
+.form-row input, .form-row select{ height:44px; }
+.form-row textarea{ padding:12px 14px; min-height:90px; resize:vertical; line-height:1.5; }
+.form-row input:focus-visible, .form-row select:focus-visible, .form-row textarea:focus-visible{ outline:var(--focus-ring); outline-offset:2px; }
+.two-col{ display:grid; gap:14px; grid-template-columns:1fr 1fr; }
+@media (max-width:640px){ .two-col{ grid-template-columns:1fr; } }
+.toast{ display:none; align-items:center; gap:10px; background:var(--green-tint); color:var(--green); border-radius:var(--radius-sm); padding:12px 16px; font-size:13.5px; font-weight:600; margin-top:14px; }
+.toast.is-visible{ display:flex; }
+.toast svg{ width:17px; height:17px; flex-shrink:0; }
+
+/* ---------- Modal ---------- */
+.modal-overlay{ position:fixed; inset:0; background:rgba(17,20,40,0.5); display:none; align-items:center; justify-content:center; padding:20px; z-index:300; }
+.modal-overlay.is-open{ display:flex; }
+.modal-panel{ background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); max-width:540px; width:100%; max-height:88vh; overflow-y:auto; padding:28px; position:relative; }
+.modal-close{ position:absolute; top:16px; right:16px; width:36px; height:36px; border-radius:50%; border:none; background:var(--surface-sunk); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.modal-close:hover{ background:var(--blue-tint); color:var(--blue-deep); }
+.modal-close svg{ width:16px; height:16px; }
+.modal-panel h2{ font-family:var(--font-display); font-weight:700; font-size:19px; padding-right:36px; margin-bottom:4px; }
+.modal-meta-row{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 18px; }
+.fact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+.fact-grid .l{ font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); font-weight:700; }
+.fact-grid .v{ font-size:14px; font-weight:600; margin-top:3px; word-break:break-word; }
+.modal-desc{ background:var(--surface-sunk); border-radius:var(--radius-sm); padding:14px; font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:18px; }
+.modal-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+/* ---------- Pitch box ---------- */
+.pitch-box{ background:var(--violet-tint); border-radius:var(--radius-sm); padding:14px; font-size:13px; color:var(--violet-deep); line-height:1.6; margin-top:10px; }
+
+.mobile-topbar{ display:none; }
+@media (max-width:880px){
+  .sidebar{ position:fixed; left:0; top:0; height:100vh; transform:translateX(-100%); transition:transform .2s ease; z-index:60; }
+  .sidebar.is-open{ transform:translateX(0); box-shadow:var(--shadow-lg); }
+  .main-area{ padding:20px 16px 60px; }
+  .mobile-topbar{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .mobile-topbar button{ width:40px; height:40px; border-radius:var(--radius-sm); border:none; background:#fff; box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:center; }
+  .mobile-topbar button svg{ width:20px; height:20px; }
+  #sidebarScrim{ display:none; position:fixed; inset:0; background:rgba(17,20,40,0.4); z-index:55; }
+  #sidebarScrim.is-visible{ display:block; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ PASSCODE GATE ============ -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-brand">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="19" stroke="currentColor" stroke-width="2"/><path d="M12 20.5L17.5 26L28 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Top <em>Business.lk</em> — Admin</span>
+    </div>
+    <h1>Sign in to the admin panel</h1>
+    <p>This area is for the Top Business.lk review team only.</p>
+    <form id="gateForm">
+      <label for="gatePass" class="visually-hidden">Passcode</label>
+      <input type="password" id="gatePass" placeholder="Enter passcode" autocomplete="current-password">
+      <div id="gateError">That passcode isn't right. Try again.</div>
+      <button type="submit" class="btn btn-primary btn-block">Enter admin panel</button>
+    </form>
+    <div class="gate-note">
+      <strong>Prototype notice:</strong> this passcode check runs in your browser only — it is not real security. Anyone who views the page source can read the passcode. Before using this with real submissions, put it behind real authentication (see the Settings tab once you're in).
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN SHELL ============ -->
+<div id="shell">
+  <div id="sidebarScrim"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="19" stroke="currentColor" stroke-width="2"/><path d="M12 20.5L17.5 26L28 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Top <em>Business.lk</em></span>
+    </div>
+    <button class="nav-item is-active" data-panel="dashboard">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="3" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="10.5" y="3" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="10.5" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="10.5" y="10.5" width="6.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-panel="queue">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="4" width="14" height="12.5" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 8.5h7M6.5 11.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Review Queue
+      <span class="nav-badge" id="queueBadge">0</span>
+    </button>
+    <button class="nav-item" data-panel="listings">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 8.5l7-5.3 7 5.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 7.8V17h11V7.8" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      Listings
+    </button>
+    <button class="nav-item" data-panel="ranking">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 17V10M9 17V4M15 17v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Ranking &amp; Pitch
+    </button>
+    <button class="nav-item" data-panel="settings">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M10 3v2M10 15v2M17 10h-2M5 10H3M15 5l-1.4 1.4M6.4 13.6L5 15M15 15l-1.4-1.4M6.4 6.4L5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Settings
+    </button>
+    <div class="sidebar-foot">
+      <a href="index.html"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> View public site</a>
+      <a href="#" id="signOutLink"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8 4H4v12h4M13 14l4-4-4-4M17 10H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Sign out</a>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <div class="mobile-topbar">
+      <button id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <strong>Admin</strong>
+    </div>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="panel is-active" id="panel-dashboard">
+      <div class="topbar">
+        <div><h1>Dashboard</h1><p>An overview of where things stand right now.</p></div>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card"><div class="icn" style="background:var(--amber-tint); color:var(--amber-deep);"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12.5" rx="2" stroke="currentColor" stroke-width="1.6"/></svg></div><div class="n" id="statPending">0</div><div class="l">Pending review</div></div>
+        <div class="stat-card"><div class="icn" style="background:var(--blue-tint); color:var(--blue-deep);"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.2l4 4 8-8.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="n" id="statLive">0</div><div class="l">Live listings</div></div>
+        <div class="stat-card"><div class="icn" style="background:var(--violet-tint); color:var(--violet-deep);"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2l1.9 4.6L17 7l-4 3.4L14 16l-4-2.9L6 16l1-5.6-4-3.4 5.1-.4L10 2z" fill="currentColor"/></svg></div><div class="n" id="statReserved">742</div><div class="l">Founding spaces reserved</div></div>
+        <div class="stat-card"><div class="icn" style="background:var(--green-tint); color:var(--green);"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="n" id="statAvgTime">—</div><div class="l">Reviewed this session</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div><h2>Needs your attention</h2><p>The oldest pending submissions, so nothing sits too long.</p></div>
+          <button class="btn btn-ghost btn-sm" data-goto="queue">Open full queue</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Business</th><th>Category</th><th>District</th><th>Submitted</th><th>Status</th><th></th></tr></thead>
+            <tbody id="dashboardQueuePreview"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REVIEW QUEUE ============ -->
+    <section class="panel" id="panel-queue">
+      <div class="topbar">
+        <div><h1>Review Queue</h1><p>Submissions from your Google Form, ready for manual review.</p></div>
+        <button class="btn btn-ghost btn-sm" data-goto="settings">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" style="width:15px;height:15px"><path d="M4 10a6 6 0 0110-4.5M16 10a6 6 0 01-10 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 3v3h-3M6 17v-3h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Connect submissions
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Business</th><th>Category</th><th>District</th><th>Contact</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="queueTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LISTINGS ============ -->
+    <section class="panel" id="panel-listings">
+      <div class="topbar">
+        <div><h1>Listings Management</h1><p>Everything currently live on the public site.</p></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h2 class="visually-hidden">Live listings</h2></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <input type="search" id="listingsSearch" placeholder="Search listings…" style="height:40px; border:none; border-radius:999px; background:var(--surface-sunk); padding:0 16px; font-size:13.5px; min-width:200px;">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Business</th><th>Category</th><th>District</th><th>Since</th><th>Status</th><th>Live</th><th>Actions</th></tr></thead>
+            <tbody id="listingsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RANKING & PITCH ============ -->
+    <section class="panel" id="panel-ranking">
+      <div class="topbar">
+        <div><h1>Ranking &amp; Pitch Tool</h1><p>Internal visibility score per business, used to pitch founding-member reservations. Ranking is never based on payment — only verification and visibility signals.</p></div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rank</th><th>Business</th><th>Category</th><th>Verification</th><th>Visibility score</th><th>Actions</th></tr></thead>
+            <tbody id="rankingTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="panel" id="panel-settings">
+      <div class="topbar">
+        <div><h1>Settings &amp; Admin Access</h1><p>Connect your submission source, manage the team, and site-wide numbers.</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h2>Connect your Google Form submissions</h2><p>Two ways to bring form responses into the Review Queue.</p></div></div>
+
+        <h3 style="font-size:14px; margin-bottom:8px;">Option A — Paste from Google Sheets (simplest, no setup)</h3>
+        <p style="color:var(--ink-soft); font-size:13px; margin-bottom:10px;">Open the linked response sheet, select the data (including header row), copy, and paste below.</p>
+        <div class="form-row">
+          <textarea id="pasteImport" placeholder="Paste copied rows from Google Sheets here…" style="min-height:110px;"></textarea>
+        </div>
+        <button class="btn btn-primary btn-sm" id="importPasteBtn">Import pasted rows</button>
+
+        <div style="height:1px; background:var(--surface-sunk); margin:22px 0;"></div>
+
+        <h3 style="font-size:14px; margin-bottom:8px;">Option B — Live sync via Apps Script (advanced)</h3>
+        <p style="color:var(--ink-soft); font-size:13px; margin-bottom:10px;">Publish the small script below as a Web App from your response sheet, then paste the URL it gives you here.</p>
+        <div class="form-row">
+          <label for="feedUrl">Apps Script Web App URL</label>
+          <input type="url" id="feedUrl" placeholder="https://script.google.com/macros/s/…/exec">
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" id="syncNowBtn">Sync now</button>
+          <button class="btn btn-ghost btn-sm" id="showScriptBtn">Show the script to paste in</button>
+        </div>
+        <div id="scriptBox" style="display:none; margin-top:14px; background:var(--ink); color:#dfe3f7; border-radius:var(--radius-sm); padding:16px; font-family:var(--font-mono); font-size:12px; overflow-x:auto; white-space:pre;"></div>
+        <div class="toast" id="importToast"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.2l4 4 8-8.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="importToastText"></span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h2>Team &amp; admin access</h2><p>Who can review, pitch, and manage listings. Display-only in this prototype — wire to real accounts when you add a backend.</p></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Role</th><th>Access level</th></tr></thead>
+            <tbody>
+              <tr><td class="cell-strong">Founder / Review Lead</td><td>Verification standards</td><td><span class="badge badge-live">Full access</span></td></tr>
+              <tr><td class="cell-strong">Business Outreach</td><td>Founding-member onboarding</td><td><span class="badge badge-approved">Queue + Ranking</span></td></tr>
+              <tr><td class="cell-strong">Verification</td><td>Confirms submissions</td><td><span class="badge badge-approved">Queue only</span></td></tr>
+              <tr><td class="cell-strong">Support</td><td>Owner questions</td><td><span class="badge badge-paused">Listings (read-only)</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h2>Founding spaces counter</h2><p>Shown on the homepage ledger. Update it manually as reservations come in.</p></div></div>
+        <div class="two-col">
+          <div class="form-row"><label for="reservedCount">Spaces reserved</label><input type="number" id="reservedCount" value="742" min="0" max="1000"></div>
+          <div class="form-row"><label for="totalCount">Total founding spaces</label><input type="number" id="totalCount" value="1000" min="1"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="saveCounterBtn">Save</button>
+        <p style="color:var(--ink-faint); font-size:12px; margin-top:10px;">Note: this is stored for the admin panel only. Since the public site is static, update the same number in index.html directly to keep them in sync.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h2>Change passcode</h2><p>Local to this browser only — see the security note below.</p></div></div>
+        <div class="two-col">
+          <div class="form-row"><label for="newPass">New passcode</label><input type="password" id="newPass" placeholder="At least 6 characters"></div>
+          <div class="form-row"><label for="confirmPass">Confirm passcode</label><input type="password" id="confirmPass" placeholder="Re-enter passcode"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="savePassBtn">Update passcode</button>
+        <div class="gate-note" style="margin-top:16px;">
+          <strong>Important:</strong> this only changes a value checked in your browser's JavaScript — it is not a real login system, and it doesn't stop someone from viewing the page source. For real admin security, put this panel behind proper authentication (for example, a small backend with Google sign-in restricted to your team's email addresses) before using it with real business data.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ SUBMISSION DETAIL MODAL ============ -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <button class="modal-close" id="detailClose" aria-label="Close"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    <h2 id="detailTitle"></h2>
+    <div class="modal-meta-row" id="detailBadges"></div>
+    <div class="fact-grid" id="detailFacts"></div>
+    <div class="modal-desc" id="detailDesc"></div>
+    <div id="detailRejectRow" style="display:none; margin-bottom:16px;">
+      <div class="form-row"><label for="rejectReason">Reason (shown to the business when they resubmit)</label><textarea id="rejectReason" placeholder="e.g. Couldn't confirm the phone number — please resubmit with a reachable contact."></textarea></div>
+    </div>
+    <div class="modal-actions" id="detailActions"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= Safe storage (falls back to memory if blocked) =================
+   Some preview/sandboxed contexts throw a SecurityError on any access to
+   localStorage/sessionStorage rather than just being empty. Every call below
+   goes through these wrappers so the panel still works — it just won't
+   remember state between reloads in that specific case. */
+var memStore = {}, memSession = {};
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return (k in memStore) ? memStore[k] : null; } }
+function lsSet(k,v){ try { localStorage.setItem(k,v); } catch(e){ memStore[k] = v; } }
+function ssGet(k){ try { return sessionStorage.getItem(k); } catch(e){ return (k in memSession) ? memSession[k] : null; } }
+function ssSet(k,v){ try { sessionStorage.setItem(k,v); } catch(e){ memSession[k] = v; } }
+function ssRemove(k){ try { sessionStorage.removeItem(k); } catch(e){ delete memSession[k]; } }
+
+/* ================= Sample seed data ================= */
+var seedPending = [
+  { id:"p1", name:"Nayana's Cake Studio", owner:"Nayana Silva", cat:"Bakery & Food", city:"Colombo", phone:"077 224 5678", email:"nayana.cakes@gmail.com", link:"https://www.instagram.com/nayanascakestudio", desc:"Custom celebration cakes and dessert tables, home-based kitchen, orders by Instagram DM.", since:"2 years", submitted:"2 days ago", status:"pending" },
+  { id:"p2", name:"Silva Electricals", owner:"Chamara Silva", cat:"Home Services", city:"Negombo", phone:"071 998 1122", email:"", link:"https://wa.me/94719981122", desc:"Residential and small commercial electrical work across Negombo and surrounding areas.", since:"6 years", submitted:"3 days ago", status:"pending" },
+  { id:"p3", name:"Kelani Tutors Network", owner:"Dilani Wickrama", cat:"Tutoring & Classes", city:"Gampaha", phone:"076 554 3321", email:"kelanitutors@gmail.com", link:"https://www.facebook.com/kelanitutors", desc:"A/L Combined Maths and Physics tutoring, group and individual classes, weekday evenings.", since:"1 year", submitted:"5 days ago", status:"pending" },
+  { id:"p4", name:"Deshan Motor Works", owner:"Deshan Perera", cat:"Home Services", city:"Kurunegala", phone:"070 112 3344", email:"", link:"facebook.com/deshanmotorworks", desc:"Vehicle servicing and repairs, pickup available for breakdowns within Kurunegala town.", since:"4 years", submitted:"1 week ago", status:"pending" }
+];
+
+var seedListings = [
+  { name:"Perera Wedding Photography", cat:"Photography & Events", city:"Colombo", initials:"PW", color:"#274BC7", since:"2021", link:"https://www.facebook.com/pereraweddingphotography", verification:98, visibility:81, live:true },
+  { name:"Lakpahana Home Repairs", cat:"Home Services", city:"Kandy", initials:"LH", color:"#7B4FE0", since:"2019", link:"https://wa.me/94771234567", verification:95, visibility:74, live:true },
+  { name:"Bandara Hardware Stores", cat:"Retail & Hardware", city:"Kurunegala", initials:"BH", color:"#E0A62E", since:"2015", link:"https://www.facebook.com/bandarahardware", verification:97, visibility:69, live:true },
+  { name:"Sweet Nangi Bakes", cat:"Bakery & Food", city:"Negombo", initials:"SN", color:"#C1603A", since:"2022", link:"https://wa.me/94759876543", verification:92, visibility:88, live:true },
+  { name:"Ishara's Tuition Class", cat:"Tutoring & Classes", city:"Colombo", initials:"IT", color:"#274BC7", since:"2020", link:"https://www.facebook.com/isharastuition", verification:94, visibility:66, live:true },
+  { name:"Glow Salon & Beauty", cat:"Salon & Beauty", city:"Galle", initials:"GS", color:"#7B4FE0", since:"2018", link:"https://www.instagram.com/glowsalongalle", verification:96, visibility:79, live:true },
+  { name:"CoolBreeze AC Repairs", cat:"Home Services", city:"Colombo", initials:"CA", color:"#274BC7", since:"2016", link:"https://www.facebook.com/coolbreezeaclk", verification:93, visibility:71, live:false }
+];
+
+/* ================= State ================= */
+var state = { pending:[], listings:[], reviewedThisSession:0 };
+
+function loadState(){
+  var savedPending = lsGet('tb_pending');
+  var savedListings = lsGet('tb_listings');
+  state.pending = savedPending ? JSON.parse(savedPending) : seedPending.slice();
+  state.listings = savedListings ? JSON.parse(savedListings) : seedListings.slice();
+}
+function saveState(){
+  lsSet('tb_pending', JSON.stringify(state.pending));
+  lsSet('tb_listings', JSON.stringify(state.listings));
+}
+
+/* ================= Icons ================= */
+var Icon = {
+  check:'<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.2l4 4 8-8.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  clock:'<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  x:'<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+};
+
+/* ================= Passcode gate ================= */
+var DEFAULT_PASS = "topbiz2026"; // CHANGE THIS — see the security note in Settings
+function getPass(){ return lsGet('tb_passcode') || DEFAULT_PASS; }
+
+document.getElementById('gateForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var val = document.getElementById('gatePass').value;
+  var err = document.getElementById('gateError');
+  if(val === getPass()){
+    ssSet('tb_authed', '1');
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('shell').classList.add('is-visible');
+    init();
+  } else {
+    err.style.display = 'block';
+  }
+});
+
+if(ssGet('tb_authed') === '1'){
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('shell').classList.add('is-visible');
+}
+
+document.getElementById('signOutLink').addEventListener('click', function(e){
+  e.preventDefault();
+  ssRemove('tb_authed');
+  location.reload();
+});
+
+/* ================= Sidebar nav ================= */
+var navItems = document.querySelectorAll('.nav-item');
+navItems.forEach(function(btn){
+  btn.addEventListener('click', function(){ showPanel(btn.getAttribute('data-panel')); });
+});
+document.querySelectorAll('[data-goto]').forEach(function(btn){
+  btn.addEventListener('click', function(){ showPanel(btn.getAttribute('data-goto')); });
+});
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('is-active'); });
+  document.getElementById('panel-' + name).classList.add('is-active');
+  navItems.forEach(function(btn){ btn.classList.toggle('is-active', btn.getAttribute('data-panel') === name); });
+  document.getElementById('sidebar').classList.remove('is-open');
+  document.getElementById('sidebarScrim').classList.remove('is-visible');
+}
+document.getElementById('menuToggle').addEventListener('click', function(){
+  var open = document.getElementById('sidebar').classList.toggle('is-open');
+  document.getElementById('sidebarScrim').classList.toggle('is-visible', open);
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+document.getElementById('sidebarScrim').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.remove('is-open');
+  this.classList.remove('is-visible');
+});
+
+/* ================= Renderers ================= */
+function catColor(cat){
+  var map = { "Photography & Events":"#274BC7", "Home Services":"#7B4FE0", "Retail & Hardware":"#E0A62E", "Bakery & Food":"#C1603A", "Tutoring & Classes":"#274BC7", "Salon & Beauty":"#7B4FE0" };
+  return map[cat] || "#545B78";
+}
+function initialsOf(name){
+  var parts = name.trim().split(/\s+/);
+  return ((parts[0]||"")[0] || "") .toUpperCase() + ((parts[1]||"")[0] || "").toUpperCase();
+}
+
+function renderAll(){
+  renderDashboard();
+  renderQueue();
+  renderListings();
+  renderRanking();
+  document.getElementById('queueBadge').textContent = state.pending.filter(function(p){ return p.status === 'pending'; }).length;
+}
+
+function renderDashboard(){
+  var pendingCount = state.pending.filter(function(p){ return p.status === 'pending'; }).length;
+  var liveCount = state.listings.filter(function(l){ return l.live; }).length;
+  document.getElementById('statPending').textContent = pendingCount;
+  document.getElementById('statLive').textContent = liveCount;
+  document.getElementById('statAvgTime').textContent = state.reviewedThisSession;
+
+  var preview = state.pending.filter(function(p){ return p.status === 'pending'; }).slice(0,4);
+  var body = document.getElementById('dashboardQueuePreview');
+  if(preview.length === 0){
+    body.innerHTML = '<tr><td colspan="6" class="empty-row">Nothing waiting for review right now.</td></tr>';
+    return;
+  }
+  body.innerHTML = preview.map(function(p){
+    return '<tr>' +
+      '<td class="cell-strong">' + p.name + '</td>' +
+      '<td>' + p.cat + '</td>' +
+      '<td>' + p.city + '</td>' +
+      '<td class="cell-muted">' + p.submitted + '</td>' +
+      '<td>' + statusBadge(p.status) + '</td>' +
+      '<td><button class="btn btn-ghost btn-sm" data-open="' + p.id + '">Review</button></td>' +
+    '</tr>';
+  }).join('');
+  wireOpenButtons(body);
+}
+
+function statusBadge(status){
+  if(status === 'approved') return '<span class="badge badge-approved">' + Icon.check + ' Approved</span>';
+  if(status === 'rejected') return '<span class="badge badge-rejected">' + Icon.x + ' Rejected</span>';
+  return '<span class="badge badge-pending">' + Icon.clock + ' Pending</span>';
+}
+
+function renderQueue(){
+  var body = document.getElementById('queueTable');
+  if(state.pending.length === 0){
+    body.innerHTML = '<tr><td colspan="7" class="empty-row">No submissions yet. Connect your Google Form in Settings to bring responses in here.</td></tr>';
+    return;
+  }
+  body.innerHTML = state.pending.map(function(p){
+    return '<tr>' +
+      '<td class="cell-strong">' + p.name + '</td>' +
+      '<td>' + p.cat + '</td>' +
+      '<td>' + p.city + '</td>' +
+      '<td class="cell-muted">' + (p.phone || '—') + '</td>' +
+      '<td class="cell-muted">' + p.submitted + '</td>' +
+      '<td>' + statusBadge(p.status) + '</td>' +
+      '<td><div class="row-actions">' +
+        '<button class="btn btn-ghost btn-sm" data-open="' + p.id + '">Review</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+  wireOpenButtons(body);
+}
+
+function renderListings(filter){
+  filter = (filter || "").toLowerCase();
+  var body = document.getElementById('listingsTable');
+  var rows = state.listings.filter(function(l){
+    return !filter || l.name.toLowerCase().indexOf(filter) !== -1 || l.cat.toLowerCase().indexOf(filter) !== -1;
+  });
+  if(rows.length === 0){
+    body.innerHTML = '<tr><td colspan="7" class="empty-row">No listings match that search.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(function(l, i){
+    var realIdx = state.listings.indexOf(l);
+    return '<tr>' +
+      '<td><span class="avatar-sm" style="background:' + l.color + '">' + l.initials + '</span> <span class="cell-strong" style="margin-left:8px;">' + l.name + '</span></td>' +
+      '<td>' + l.cat + '</td>' +
+      '<td>' + l.city + '</td>' +
+      '<td class="cell-muted">' + l.since + '</td>' +
+      '<td>' + (l.live ? '<span class="badge badge-live">Live</span>' : '<span class="badge badge-paused">Paused</span>') + '</td>' +
+      '<td><label class="toggle"><input type="checkbox" ' + (l.live ? 'checked' : '') + ' data-toggle-live="' + realIdx + '"><span class="track"></span></label></td>' +
+      '<td><div class="row-actions"><button class="btn btn-danger btn-sm" data-remove-listing="' + realIdx + '">Remove</button></div></td>' +
+    '</tr>';
+  }).join('');
+
+  body.querySelectorAll('[data-toggle-live]').forEach(function(input){
+    input.addEventListener('change', function(){
+      var idx = +this.getAttribute('data-toggle-live');
+      state.listings[idx].live = this.checked;
+      saveState(); renderAll();
+    });
+  });
+  body.querySelectorAll('[data-remove-listing]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = +this.getAttribute('data-remove-listing');
+      if(confirm('Remove "' + state.listings[idx].name + '" from the directory? This cannot be undone here.')){
+        state.listings.splice(idx, 1);
+        saveState(); renderAll();
+      }
+    });
+  });
+}
+
+function renderRanking(){
+  var body = document.getElementById('rankingTable');
+  var byCategory = {};
+  state.listings.forEach(function(l){
+    if(!byCategory[l.cat]) byCategory[l.cat] = [];
+    byCategory[l.cat].push(l);
+  });
+  var rowsHtml = [];
+  Object.keys(byCategory).sort().forEach(function(cat){
+    var group = byCategory[cat].slice().sort(function(a,b){ return b.visibility - a.visibility; });
+    group.forEach(function(l, i){
+      var idx = state.listings.indexOf(l);
+      rowsHtml.push(
+        '<tr>' +
+          '<td class="cell-strong">#' + (i+1) + '</td>' +
+          '<td><span class="avatar-sm" style="background:' + l.color + '">' + l.initials + '</span> <span class="cell-strong" style="margin-left:8px;">' + l.name + '</span></td>' +
+          '<td>' + l.cat + '</td>' +
+          '<td>' + l.verification + '%</td>' +
+          '<td>' + l.visibility + '</td>' +
+          '<td><button class="btn btn-ghost btn-sm" data-pitch="' + idx + '">Copy pitch</button></td>' +
+        '</tr>'
+      );
+    });
+  });
+  body.innerHTML = rowsHtml.join('') || '<tr><td colspan="6" class="empty-row">No listings yet to rank.</td></tr>';
+
+  body.querySelectorAll('[data-pitch]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = +this.getAttribute('data-pitch');
+      var l = state.listings[idx];
+      var group = byCategory[l.cat].slice().sort(function(a,b){ return b.visibility - a.visibility; });
+      var rank = group.indexOf(l) + 1;
+      var reserved = document.getElementById('reservedCount') ? document.getElementById('reservedCount').value : '742';
+      var total = document.getElementById('totalCount') ? document.getElementById('totalCount').value : '1000';
+      var msg = "Hi! Quick update on your Top Business.lk listing — " + l.name + " is currently ranked #" + rank + " in " + l.cat +
+        " based on verification and visibility. We're at " + reserved + " of " + total + " founding spaces reserved, so positions are filling up. " +
+        "Want to lock in your founding-member rate before it changes? Just reply here and we'll confirm the details.";
+      copyText(msg);
+      showPitchCopied(btn);
+    });
+  });
+}
+
+function showPitchCopied(btn){
+  var original = btn.textContent;
+  btn.textContent = "Copied ✓";
+  setTimeout(function(){ btn.textContent = original; }, 1600);
+}
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text); }
+  else {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+function wireOpenButtons(container){
+  container.querySelectorAll('[data-open]').forEach(function(btn){
+    btn.addEventListener('click', function(){ openDetail(btn.getAttribute('data-open')); });
+  });
+}
+
+/* ================= Detail modal ================= */
+var detailModal = document.getElementById('detailModal');
+var currentDetailId = null;
+
+function openDetail(id){
+  var item = state.pending.find(function(p){ return p.id === id; });
+  if(!item) return;
+  currentDetailId = id;
+
+  document.getElementById('detailTitle').textContent = item.name;
+  document.getElementById('detailBadges').innerHTML = statusBadge(item.status) +
+    ' <span class="badge badge-live">' + item.cat + '</span> <span class="badge badge-paused">' + item.city + '</span>';
+  document.getElementById('detailFacts').innerHTML =
+    '<div><div class="l">Owner / contact</div><div class="v">' + (item.owner || '—') + '</div></div>' +
+    '<div><div class="l">Phone / WhatsApp</div><div class="v">' + (item.phone || '—') + '</div></div>' +
+    '<div><div class="l">Email</div><div class="v">' + (item.email || '—') + '</div></div>' +
+    '<div><div class="l">Website / social link</div><div class="v"><a href="' + normalizeLink(item.link) + '" target="_blank" rel="noopener noreferrer">' + (item.link || '—') + '</a></div></div>' +
+    '<div><div class="l">Years in business</div><div class="v">' + (item.since || '—') + '</div></div>' +
+    '<div><div class="l">Submitted</div><div class="v">' + (item.submitted || '—') + '</div></div>';
+  document.getElementById('detailDesc').textContent = item.desc || 'No description provided.';
+  document.getElementById('detailRejectRow').style.display = 'none';
+  document.getElementById('rejectReason').value = '';
+
+  var actions = document.getElementById('detailActions');
+  if(item.status === 'pending'){
+    actions.innerHTML =
+      '<button class="btn btn-success" id="approveBtn">' + Icon.check + ' Approve &amp; publish</button>' +
+      '<button class="btn btn-danger" id="rejectBtn">' + Icon.x + ' Reject</button>' +
+      '<a class="btn btn-ghost" href="' + normalizeLink(item.link) + '" target="_blank" rel="noopener noreferrer">Visit their link</a>';
+    document.getElementById('approveBtn').addEventListener('click', function(){ approveItem(item.id); });
+    document.getElementById('rejectBtn').addEventListener('click', function(){
+      document.getElementById('detailRejectRow').style.display = 'block';
+      this.textContent = '';
+      this.innerHTML = Icon.x + ' Confirm rejection';
+      this.onclick = function(){ rejectItem(item.id, document.getElementById('rejectReason').value); };
+    });
+  } else {
+    actions.innerHTML = '<a class="btn btn-ghost" href="' + normalizeLink(item.link) + '" target="_blank" rel="noopener noreferrer">Visit their link</a>';
+  }
+
+  detailModal.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+}
+function normalizeLink(link){
+  if(!link) return '#';
+  return /^https?:\/\//i.test(link) ? link : 'https://' + link;
+}
+function closeDetail(){
+  detailModal.classList.remove('is-open');
+  document.body.style.overflow = '';
+  currentDetailId = null;
+}
+document.getElementById('detailClose').addEventListener('click', closeDetail);
+detailModal.addEventListener('click', function(e){ if(e.target === detailModal) closeDetail(); });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && detailModal.classList.contains('is-open')) closeDetail(); });
+
+function approveItem(id){
+  var idx = state.pending.findIndex(function(p){ return p.id === id; });
+  if(idx === -1) return;
+  var item = state.pending[idx];
+  item.status = 'approved';
+  state.listings.push({
+    name:item.name, cat:item.cat, city:item.city, initials:initialsOf(item.name),
+    color: catColor(item.cat), since: item.since || 'New', link: item.link,
+    verification: 90, visibility: 50, live: true
+  });
+  state.reviewedThisSession++;
+  saveState(); renderAll(); closeDetail();
+}
+function rejectItem(id, reason){
+  var idx = state.pending.findIndex(function(p){ return p.id === id; });
+  if(idx === -1) return;
+  state.pending[idx].status = 'rejected';
+  state.pending[idx].rejectReason = reason;
+  state.reviewedThisSession++;
+  saveState(); renderAll(); closeDetail();
+}
+
+/* ================= Listings search ================= */
+document.getElementById('listingsSearch').addEventListener('input', function(){
+  renderListings(this.value);
+});
+
+/* ================= Settings: import ================= */
+function parseDelimited(text){
+  var lines = text.trim().split(/\r?\n/).filter(function(l){ return l.trim().length; });
+  if(lines.length < 2) return [];
+  var delim = lines[0].indexOf('\t') !== -1 ? '\t' : ',';
+  var headers = lines[0].split(delim).map(function(h){ return h.trim().toLowerCase(); });
+  return lines.slice(1).map(function(line, i){
+    var cols = line.split(delim);
+    var row = {};
+    headers.forEach(function(h, j){ row[h] = (cols[j] || '').trim(); });
+    return {
+      id: 'imp' + Date.now() + '_' + i,
+      name: row['business name'] || row['name'] || 'Untitled business',
+      owner: row['owner / contact person'] || row['owner'] || '',
+      cat: row['category'] || 'Other',
+      city: row['district'] || row['city'] || '',
+      phone: row['phone or whatsapp number'] || row['phone'] || '',
+      email: row['email address'] || row['email'] || '',
+      link: row['business website or social media link'] || row['link'] || '',
+      desc: row['short description (under 200 characters)'] || row['description'] || '',
+      since: row['years in business'] || '',
+      submitted: 'Imported just now',
+      status: 'pending'
+    };
+  });
+}
+
+document.getElementById('importPasteBtn').addEventListener('click', function(){
+  var raw = document.getElementById('pasteImport').value;
+  var rows = parseDelimited(raw);
+  if(rows.length === 0){
+    flashToast('importToast', 'importToastText', "Couldn't find any rows — make sure you copied the header row too.");
+    return;
+  }
+  state.pending = state.pending.concat(rows);
+  saveState(); renderAll();
+  document.getElementById('pasteImport').value = '';
+  flashToast('importToast', 'importToastText', 'Imported ' + rows.length + ' submission' + (rows.length === 1 ? '' : 's') + ' into the queue.');
+});
+
+document.getElementById('syncNowBtn').addEventListener('click', function(){
+  var url = document.getElementById('feedUrl').value.trim();
+  if(!url){ flashToast('importToast', 'importToastText', 'Paste your Apps Script Web App URL first.'); return; }
+  lsSet('tb_feed_url', url);
+  fetch(url).then(function(r){ return r.json(); }).then(function(data){
+    var rows = (Array.isArray(data) ? data : []).map(function(row, i){
+      return {
+        id: 'feed' + Date.now() + '_' + i,
+        name: row['Business name'] || row['name'] || 'Untitled business',
+        owner: row['Owner / contact person'] || '',
+        cat: row['Category'] || 'Other',
+        city: row['District'] || '',
+        phone: row['Phone or WhatsApp number'] || '',
+        email: row['Email address'] || '',
+        link: row['Business website or social media link'] || '',
+        desc: row['Short description (under 200 characters)'] || '',
+        since: row['Years in business'] || '',
+        submitted: 'Synced just now',
+        status: 'pending'
+      };
+    });
+    state.pending = state.pending.concat(rows);
+    saveState(); renderAll();
+    flashToast('importToast', 'importToastText', 'Synced ' + rows.length + ' submission' + (rows.length === 1 ? '' : 's') + ' from your form.');
+  }).catch(function(){
+    flashToast('importToast', 'importToastText', "Couldn't reach that URL. Check the deployment is set to \u201cAnyone\u201d access, or use the paste option instead.");
+  });
+});
+
+document.getElementById('showScriptBtn').addEventListener('click', function(){
+  var box = document.getElementById('scriptBox');
+  var visible = box.style.display === 'block';
+  box.style.display = visible ? 'none' : 'block';
+  if(!visible){
+    box.textContent =
+"function doGet(e) {\n" +
+"  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];\n" +
+"  var data = sheet.getDataRange().getValues();\n" +
+"  var headers = data.shift();\n" +
+"  var rows = data.map(function(row) {\n" +
+"    var obj = {};\n" +
+"    headers.forEach(function(h, i) { obj[h] = row[i]; });\n" +
+"    return obj;\n" +
+"  });\n" +
+"  return ContentService.createTextOutput(JSON.stringify(rows))\n" +
+"    .setMimeType(ContentService.MimeType.JSON);\n" +
+"}\n\n" +
+"// In your response Google Sheet: Extensions > Apps Script, paste this,\n" +
+"// then Deploy > New deployment > Web app.\n" +
+"// Execute as: Me.  Who has access: Anyone.\n" +
+"// Copy the resulting URL into the field above.";
+  }
+});
+
+function flashToast(boxId, textId, text){
+  document.getElementById(textId).textContent = text;
+  var box = document.getElementById(boxId);
+  box.classList.add('is-visible');
+  setTimeout(function(){ box.classList.remove('is-visible'); }, 4500);
+}
+
+/* ================= Settings: counters, passcode ================= */
+document.getElementById('saveCounterBtn').addEventListener('click', function(){
+  var reserved = document.getElementById('reservedCount').value;
+  var total = document.getElementById('totalCount').value;
+  lsSet('tb_reserved', reserved);
+  lsSet('tb_total', total);
+  document.getElementById('statReserved').textContent = reserved;
+  flashToast('importToast', 'importToastText', 'Saved. Remember to update index.html to match.');
+});
+
+document.getElementById('savePassBtn').addEventListener('click', function(){
+  var a = document.getElementById('newPass').value;
+  var b = document.getElementById('confirmPass').value;
+  if(a.length < 6){ alert('Use at least 6 characters.'); return; }
+  if(a !== b){ alert("Passcodes don't match."); return; }
+  lsSet('tb_passcode', a);
+  document.getElementById('newPass').value = '';
+  document.getElementById('confirmPass').value = '';
+  flashToast('importToast', 'importToastText', 'Passcode updated for this browser.');
+});
+
+/* ================= Init ================= */
+function init(){
+  loadState();
+  var savedUrl = lsGet('tb_feed_url');
+  if(savedUrl) document.getElementById('feedUrl').value = savedUrl;
+  var savedReserved = lsGet('tb_reserved');
+  var savedTotal = lsGet('tb_total');
+  if(savedReserved) document.getElementById('reservedCount').value = savedReserved;
+  if(savedTotal) document.getElementById('totalCount').value = savedTotal;
+  document.getElementById('statReserved').textContent = savedReserved || '742';
+  renderAll();
+}
+if(ssGet('tb_authed') === '1') init();
+
+})();
+</script>
+</body>
+</html>
