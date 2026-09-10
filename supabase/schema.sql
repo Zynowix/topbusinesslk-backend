@@ -93,7 +93,7 @@ BEFORE UPDATE ON public.submissions
 FOR EACH ROW EXECUTE PROCEDURE public.set_current_timestamp_updated_at();
 
 -- ==============================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ROW LEVEL SECURITY (RLS) POLICIES (Hardened)
 -- ==============================================================================
 ALTER TABLE public.businesses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
@@ -102,40 +102,60 @@ ALTER TABLE public.admin_settings ENABLE ROW LEVEL SECURITY;
 -- Clean existing policies
 DROP POLICY IF EXISTS "Public can view live businesses" ON public.businesses;
 DROP POLICY IF EXISTS "Allow all for authenticated/service role on businesses" ON public.businesses;
+DROP POLICY IF EXISTS "Allow writes for service role and admin on businesses" ON public.businesses;
+DROP POLICY IF EXISTS "Public can view live businesses only" ON public.businesses;
+DROP POLICY IF EXISTS "Service role full access on businesses" ON public.businesses;
+
 DROP POLICY IF EXISTS "Public can submit business intake" ON public.submissions;
 DROP POLICY IF EXISTS "Allow all for authenticated/service role on submissions" ON public.submissions;
+DROP POLICY IF EXISTS "Allow writes for service role and admin on submissions" ON public.submissions;
+DROP POLICY IF EXISTS "Public can submit pending intake only" ON public.submissions;
+DROP POLICY IF EXISTS "Service role full access on submissions" ON public.submissions;
+
 DROP POLICY IF EXISTS "Public can view settings" ON public.admin_settings;
 DROP POLICY IF EXISTS "Allow all for authenticated/service role on settings" ON public.admin_settings;
+DROP POLICY IF EXISTS "Allow writes for service role and admin on settings" ON public.admin_settings;
+DROP POLICY IF EXISTS "Service role full access on settings" ON public.admin_settings;
 
--- Businesses policies:
--- Anyone can view live listings (or admins can view all via anon key or service role)
-CREATE POLICY "Public can view live businesses"
+-- 1. Businesses policies:
+-- Public can ONLY view verified live businesses
+CREATE POLICY "Public can view live businesses only"
 ON public.businesses FOR SELECT
-USING (true);
+TO anon, authenticated, service_role
+USING (live = true);
 
-CREATE POLICY "Allow writes for service role and admin on businesses"
+-- ONLY service_role (server-side) can INSERT, UPDATE, or DELETE businesses
+CREATE POLICY "Service role full access on businesses"
 ON public.businesses FOR ALL
+TO service_role
 USING (true)
 WITH CHECK (true);
 
--- Submissions policies:
--- Anyone can submit their business for verification
-CREATE POLICY "Public can submit business intake"
+-- 2. Submissions policies:
+-- Public can ONLY INSERT new submissions with status forced to 'pending'
+CREATE POLICY "Public can submit pending intake only"
 ON public.submissions FOR INSERT
-WITH CHECK (true);
+TO anon, authenticated, service_role
+WITH CHECK (status = 'pending');
 
-CREATE POLICY "Allow writes for service role and admin on submissions"
+-- ONLY service_role (server-side admin) can SELECT, UPDATE, or DELETE submissions
+CREATE POLICY "Service role full access on submissions"
 ON public.submissions FOR ALL
+TO service_role
 USING (true)
 WITH CHECK (true);
 
--- Admin settings policies:
+-- 3. Admin settings policies:
+-- Public can view general settings
 CREATE POLICY "Public can view settings"
 ON public.admin_settings FOR SELECT
+TO anon, authenticated, service_role
 USING (true);
 
-CREATE POLICY "Allow writes for service role and admin on settings"
+-- ONLY service_role can update settings
+CREATE POLICY "Service role full access on settings"
 ON public.admin_settings FOR ALL
+TO service_role
 USING (true)
 WITH CHECK (true);
 

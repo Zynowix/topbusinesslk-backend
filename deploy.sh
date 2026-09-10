@@ -49,7 +49,7 @@ cat << 'EOF' > .env.local
 NEXT_PUBLIC_SUPABASE_URL=https://rodoltevqllzmbohitrr.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvZG9sdGV2cWxsem1ib2hpdHJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MzYxODUsImV4cCI6MjEwNDQxMjE4NX0.3FdY7bRRi4S3MT8wgrAMtPfWgLy1tqRxIwDImUQ-Ex8
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvZG9sdGV2cWxsem1ib2hpdHJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODgzNjE4NSwiZXhwIjoyMTA0NDEyMTg1fQ.5EPyw4AeS5HAJedsw8lZCZQVj138KWoOxe_i4JHPkm4
-NEXT_PUBLIC_ADMIN_PASSCODE=topbiz2026
+ADMIN_PASSCODE=topbiz2026
 EOF
 
 echo ">>> [4/7] Installing npm packages..."
@@ -61,10 +61,10 @@ npm run build
 echo ">>> [6/7] Managing PM2 process..."
 if pm2 describe topbusiness >/dev/null 2>&1; then
     echo ">>> Reloading existing PM2 process..."
-    pm2 reload topbusiness --update-env
+    pm2 reload topbusiness --update-env --max-memory-restart 600M
 else
     echo ">>> Starting new PM2 process..."
-    pm2 start npm --name "topbusiness" -- start
+    pm2 start npm --name "topbusiness" --max-memory-restart 600M -- start
 fi
 pm2 save
 pm2 startup systemd -u root --hp /root || true
